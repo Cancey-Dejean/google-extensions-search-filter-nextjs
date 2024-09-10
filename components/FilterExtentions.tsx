@@ -16,10 +16,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Star } from "lucide-react";
 import Banner from "./ui/Banner";
 import FilterCard from "./ui/FilterCard";
+import { Skeleton } from "@/components/ui/skeleton";
+
 import { cn } from "@/lib/utils";
 
 // Mock data for tools
-const toolsData = [
+const extensionsData = [
   {
     id: 1,
     name: "Hyperise",
@@ -165,6 +167,8 @@ const sortOptions = ["Most Relevant", "Highest rated"];
 export function FilterExtentions() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [filteredTools, setFilteredTools] = useState<typeof extensionsData>([]);
 
   const [selectedFilter, setSelectedFilter] = useState(
     searchParams.get("filter") || "All",
@@ -178,18 +182,22 @@ export function FilterExtentions() {
   const [selectedSubcategory, setSelectedSubcategory] = useState(
     searchParams.get("subcategory") || "",
   );
-  const [filteredTools, setFilteredTools] = useState(toolsData);
 
   useEffect(() => {
-    let filtered = toolsData;
+    setIsLoading(true);
+    let filtered = extensionsData;
 
     if (selectedCategory) {
-      filtered = filtered.filter((tool) => tool.category === selectedCategory);
+      filtered = filtered.filter(
+        (tool) =>
+          tool.category.toLowerCase() === selectedCategory.toLowerCase(),
+      );
     }
 
     if (selectedSubcategory) {
       filtered = filtered.filter(
-        (tool) => tool.subcategory === selectedSubcategory,
+        (tool) =>
+          tool.subcategory.toLowerCase() === selectedSubcategory.toLowerCase(),
       );
     }
 
@@ -206,6 +214,7 @@ export function FilterExtentions() {
     });
 
     setFilteredTools(sorted);
+    setIsLoading(false);
   }, [selectedFilter, selectedSort, selectedCategory, selectedSubcategory]);
 
   useEffect(() => {
@@ -311,27 +320,39 @@ export function FilterExtentions() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {filteredTools.length > 0 ? (
-                filteredTools.map((tool) => (
-                  <div
-                    key={tool.id}
-                    className="transition-opacity duration-300 ease-in-out"
-                  >
-                    <FilterCard {...tool} />
+            {isLoading ? (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {[...Array(2)].map((_, index) => (
+                  <div key={index} className="space-y-2">
+                    <Skeleton className="h-[180px] w-full rounded-lg" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
                   </div>
-                ))
-              ) : (
-                <div className="col-span-full py-8">
-                  <p className="text-xl font-semibold text-gray-600">
-                    No results found
-                  </p>
-                  <p className="mt-2 text-gray-500">
-                    Try adjusting your filter or sort criteria
-                  </p>
-                </div>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {filteredTools.length > 0 ? (
+                  filteredTools.map((tool) => (
+                    <div
+                      key={tool.id}
+                      className="transition-opacity duration-300 ease-in-out"
+                    >
+                      <FilterCard {...tool} />
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full py-8">
+                    <p className="text-xl font-semibold text-gray-600">
+                      No results found
+                    </p>
+                    <p className="mt-2 text-gray-500">
+                      Try adjusting your filter or sort criteria
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
       </main>
