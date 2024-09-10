@@ -143,7 +143,7 @@ const categories = [
 
 export async function GET(request: Request) {
   // Simulate a delay to mimic a real API call
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  // await new Promise((resolve) => setTimeout(resolve, 500));
 
   // Get query parameters
   const { searchParams } = new URL(request.url);
