@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Button } from "../button";
 import Link from "next/link";
 
@@ -13,7 +12,9 @@ export default function Banner() {
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-[526px] px-[52px]">
             <div className="flex flex-col gap-2">
-              <h1 className="text-[28px] font-bold">Editors' Picks for you</h1>
+              <h1 className="text-[28px] font-bold">
+                Editors&apos; Picks for you
+              </h1>
               <p className="text-base">Handpicked by Chrome Editors</p>
             </div>
 

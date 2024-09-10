@@ -1,7 +1,6 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../card";
+import { Card } from "../card";
 import Image from "next/image";
-import { Star, StarIcon } from "lucide-react";
 import { InfoIcon, StarFullIcon } from "../svgIcons";
 
 type Tool = {
@@ -19,7 +18,6 @@ export default function FilterCard({
   reviews,
   description,
   featured,
-  established,
 }: Tool) {
   return (
     <Card className="rounded-[20px] border-none bg-[#eff2ef] p-4 shadow-none">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -27,27 +27,34 @@ type Category = {
   subcategories: string[];
 };
 
+export type SearchParams = { [key: string]: string | string[] | undefined };
+
 const filterOptions = ["All", "Featured", "Established publishers"];
 const sortOptions = ["Most Relevant", "Highest rated"];
 
-export function FilterExtentions() {
+export function FilterExtentions({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+
   const [isLoading, setIsLoading] = useState(true);
   const [filteredTools, setFilteredTools] = useState<Extension[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
+  // Update how you access search params
   const [selectedCategory, setSelectedCategory] = useState(
-    searchParams.get("category") || "",
+    (searchParams.category as string) || "",
   );
   const [selectedSubcategory, setSelectedSubcategory] = useState(
-    searchParams.get("subcategory") || "",
+    (searchParams.subcategory as string) || "",
   );
   const [selectedFilter, setSelectedFilter] = useState(
-    searchParams.get("filter") || "All",
+    (searchParams.filter as string) || "All",
   );
   const [selectedSort, setSelectedSort] = useState(
-    searchParams.get("sort") || "Most Relevant",
+    (searchParams.sort as string) || "Most Relevant",
   );
 
   useEffect(() => {
@@ -77,14 +84,16 @@ export function FilterExtentions() {
   }, [selectedFilter, selectedSort, selectedCategory, selectedSubcategory]);
 
   const updateURL = (newParams: Record<string, string>) => {
-    const params = new URLSearchParams(searchParams);
-    Object.entries(newParams).forEach(([key, value]) => {
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
-    });
+    const params = new URLSearchParams();
+    Object.entries({ ...searchParams, ...newParams }).forEach(
+      ([key, value]) => {
+        if (value) {
+          params.set(key, value as string);
+        } else {
+          params.delete(key);
+        }
+      },
+    );
     router.push(`?${params.toString()}`);
   };
 
