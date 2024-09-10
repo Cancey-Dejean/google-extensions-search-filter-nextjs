@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Banner from "./ui/Banner";
 import FilterCard from "./ui/FilterCard";
-import { Skeleton } from "@/components/ui/skeleton";
-
+import { Suspense } from "react";
 import { cn } from "@/lib/utils";
+import { FilterCardSkeleton } from "./FilterCardSkeleton";
 
 type Extension = {
   id: string;
@@ -39,7 +39,6 @@ export function FilterExtentions({
 }) {
   const router = useRouter();
 
-  const [isLoading, setIsLoading] = useState(true);
   const [filteredTools, setFilteredTools] = useState<Extension[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -59,7 +58,6 @@ export function FilterExtentions({
 
   useEffect(() => {
     async function fetchData() {
-      setIsLoading(true);
       const params = new URLSearchParams();
       if (selectedCategory) params.set("category", selectedCategory);
       if (selectedSubcategory) params.set("subcategory", selectedSubcategory);
@@ -70,13 +68,11 @@ export function FilterExtentions({
         const response = await fetch(`/api/extensions?${params.toString()}`);
         const data = await response.json();
         setFilteredTools(data.extensions);
-        setCategories(data.categories); // Add this line
+        setCategories(data.categories);
       } catch (error) {
         console.error("Error fetching data:", error);
         setFilteredTools([]);
-        setCategories([]); // Add this line
-      } finally {
-        setIsLoading(false);
+        setCategories([]);
       }
     }
 
@@ -194,17 +190,7 @@ export function FilterExtentions({
               </div>
             </div>
 
-            {isLoading ? (
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {[...Array(2)].map((_, index) => (
-                  <div key={index} className="space-y-2">
-                    <Skeleton className="h-[180px] w-full rounded-lg" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </div>
-                ))}
-              </div>
-            ) : (
+            <Suspense fallback={<FilterCardSkeleton />}>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {filteredTools.length > 0 ? (
                   filteredTools.map((tool) => (
@@ -226,7 +212,7 @@ export function FilterExtentions({
                   </div>
                 )}
               </div>
-            )}
+            </Suspense>
           </>
         )}
       </main>
